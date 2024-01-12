@@ -2,7 +2,7 @@ import pygame
 from affichage import dessin, ecriture
 import os
 from menu_campagne import campagne
-from pve import pvp
+from pve import pve
 
 pygame.init()
 # ecriture:
@@ -75,7 +75,7 @@ def menu():
                         3] and evenement.pos[1] <= coordonne_y_ecrtiture[2] and evenement.pos[1] >= \
                             coordonne_y_ecrtiture[3]:
                         # votre fonction J vs Opendu_menu
-                        pass
+                        pve((largeur, hauteur), fenetre)
 
 
                     elif evenement.pos[0] <= coordonne_x_ecrtiture[4] and evenement.pos[0] >= coordonne_x_ecrtiture[
