@@ -5,13 +5,15 @@ from menu_campagne import campagne
 from pve import pve
 
 pygame.init()
+
 # ecriture:
 pygame.font.init()
-police_chr = pygame.font.SysFont("qlksjdhfjkqsdhjks", 30)
+police_chr = pygame.font.Font('../resources/LilitaOne-Regular.ttf', 30)
 
 # fenêtre:
 largeur, hauteur = 1925, 1025
-arriere_plan = pygame.transform.scale(pygame.image.load('../img/pendu_menu.png'), (largeur, hauteur))
+# convert() optimise les performances du programme
+arriere_plan = pygame.transform.scale(pygame.image.load('../img/pendu_menu.png').convert(), (largeur, hauteur))
 fenetre = pygame.display.set_mode((largeur, hauteur))
 
 # Choix:
@@ -37,7 +39,7 @@ def menu():
 
     # 2: Affichage + recupération des coordonnées des ecritures:
     for i in range(0, 4):
-        choix = police_chr.render(choix_ecr[i], 1, 'black')
+        choix = police_chr.render(choix_ecr[i], True, 'black')
         ecriture(fenetre, choix, (largeur / 2) - (choix.get_width() / 2), (hauteur - ecart_bord_haut) + (ecart_ecriture * i))
 
         coordonne_x_ecrtiture.append(largeur / 2 - choix.get_width() / 2 + choix.get_width())
@@ -47,10 +49,9 @@ def menu():
         coordonne_y_ecrtiture.append(hauteur - ecart_bord_haut + ecart_ecriture * i - choix.get_height())
 
     pygame.display.update()  # rafraichi la fenêtre
+    clock.tick(60)  # FPS max
 
     while jeu:
-
-        clock.tick(60)  # FPS max
         pygame.display.update()  # rafraichi la fenêtre
 
         for evenement in pygame.event.get():

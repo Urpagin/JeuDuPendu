@@ -1,6 +1,7 @@
 import pygame
 from affichage import dessin
 
+
 def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
     """
     fonction qui ....
@@ -16,4 +17,3 @@ def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
     while jeu:
         for evenement in pygame.event.get():
             pass
-

@@ -10,17 +10,17 @@ print(type(fenetre))
 
 
 def campagne(clock: pygame.time.Clock):
-    jeu = True
     # affichage:
     dessin(fenetre, arriere_plan)
 
-    pygame.display.update()  # rafraichi la fenêtre
+    clock.tick(60)  # FPS max
 
-    while jeu:
+    while True:
 
-        clock.tick(60)  # FPS max
+        pygame.display.update()  # rafraichi la fenêtre
 
         for evenement in pygame.event.get():
 
             if evenement.type == pygame.QUIT:
                 pygame.quit()
+                exit(0)
