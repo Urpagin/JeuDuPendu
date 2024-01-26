@@ -3,6 +3,7 @@ from affichage import dessin, ecriture
 import os
 from menu_campagne import campagne
 from pve import pve
+from utils.button import Button
 
 pygame.init()
 
@@ -17,7 +18,7 @@ arriere_plan = pygame.transform.scale(pygame.image.load('../img/pendu_menu.png')
 fenetre = pygame.display.set_mode((largeur, hauteur))
 
 # Choix:
-choix_ecr = ['joueur VS ordinateur', 'joueur VS joueur', 'campagne', 'quitter']
+choix_ecr = ['Joueur VS Ordinateur', 'Joueur VS Joueur', 'Campagne', 'Quitter']
 ecart_bord_haut = hauteur - (hauteur * 7 / 41)
 ecart_ecriture = hauteur * 8 / 41
 
@@ -58,6 +59,7 @@ def menu():
 
             if evenement.type == pygame.QUIT:
                 pygame.quit()
+                raise SystemExit
 
             if evenement.type == pygame.MOUSEBUTTONDOWN:
                 # evenement.button est le tipe de clique. (1: clique gauche, 2: clique molette 3: clique droit, etc)
@@ -68,16 +70,15 @@ def menu():
                     if evenement.pos[0] <= coordonne_x_ecrtiture[0] and evenement.pos[0] >= coordonne_x_ecrtiture[1] and \
                             evenement.pos[1] <= coordonne_y_ecrtiture[0] and evenement.pos[1] >= coordonne_y_ecrtiture[
                         1]:
-                        # votre fonction J vs J
-                        pass
+                        # Player vs Computer
+                        pve((largeur, hauteur), fenetre)
 
 
                     elif coordonne_x_ecrtiture[2] >= evenement.pos[0] >= coordonne_x_ecrtiture[
                         3] and evenement.pos[1] <= coordonne_y_ecrtiture[2] and evenement.pos[1] >= \
                             coordonne_y_ecrtiture[3]:
-                        # votre fonction J vs Opendu_menu
-                        pve((largeur, hauteur), fenetre)
-
+                        # Player vs Player
+                        pass
 
                     elif evenement.pos[0] <= coordonne_x_ecrtiture[4] and evenement.pos[0] >= coordonne_x_ecrtiture[
                         5] and evenement.pos[1] <= coordonne_y_ecrtiture[4] and evenement.pos[1] >= \

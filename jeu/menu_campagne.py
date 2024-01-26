@@ -13,8 +13,6 @@ def campagne(clock: pygame.time.Clock):
     # affichage:
     dessin(fenetre, arriere_plan)
 
-    clock.tick(60)  # FPS max
-
     while True:
 
         pygame.display.update()  # rafraichi la fenêtre
@@ -23,4 +21,6 @@ def campagne(clock: pygame.time.Clock):
 
             if evenement.type == pygame.QUIT:
                 pygame.quit()
-                exit(0)
+                raise SystemExit
+
+        clock.tick(60)  # FPS max
