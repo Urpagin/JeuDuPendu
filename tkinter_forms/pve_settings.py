@@ -1,38 +1,19 @@
-import tkinter as tk
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget
 
-# Initialize the main window
-root = tk.Tk()
-root.geometry('500x420')
-root.title("Paramètres Mode Solo")
+# Create an instance of QApplication
+app = QApplication([])
 
-# Variables
-player_name = tk.StringVar()
-difficulty = tk.StringVar()
-language = tk.StringVar()
+# Create an in stance of QWidget which will be the main window
+window = QWidget()
+window.setWindowTitle('Hello World App')  # Set the window title
+window.setGeometry(100, 100, 280, 80)  # Set the window size and position
 
-# Main Frame
-main_frame = tk.Frame(root)
-main_frame.pack(expand=True)
+# Create a QLabel widget to display 'Hello World'
+label = QLabel('Hello World', parent=window)
+label.move(90, 20)  # Position the label inside the window
 
-# Widgets in the main frame
-tk.Label(main_frame, text="Nom du joueur: ").grid(row=0, column=0, sticky="w")
-tk.Entry(main_frame, textvariable=player_name).grid(row=0, column=1)
+# Show the window
+window.show()
 
-tk.Label(main_frame, text="Difficulté: ").grid(row=1, column=0, sticky="w")
-difficulty_options = ["Facile", "Normal", "Difficile"]
-tk.OptionMenu(main_frame, difficulty, *difficulty_options).grid(row=1, column=1)
-
-tk.Label(main_frame, text="Language:").grid(row=2, column=0, sticky="w")
-language_options = ["Français", "English"]
-tk.OptionMenu(main_frame, language, *language_options).grid(row=2, column=1)
-
-# Submit Button Action
-def submit_action():
-    print(f"Player Name: {player_name.get()}")
-    print(f"Difficulty: {difficulty.get()}")
-    print(f"Language: {language.get()}")
-
-tk.Button(main_frame, text="Submit", command=submit_action).grid(row=3, column=0, columnspan=2)
-
-# Main loop
-root.mainloop()
+# Execute the application's main loop
+app.exec()

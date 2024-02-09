@@ -4,6 +4,7 @@ import os
 from menu_campagne import campagne
 from pve import pve
 from utils.button import Button
+from qt_guis.new_game_settings import widget
 
 pygame.init()
 
@@ -17,7 +18,7 @@ largeur, hauteur = 1925, 1025
 arriere_plan = pygame.transform.scale(pygame.image.load('../img/pendu_menu.png').convert(), (largeur, hauteur))
 fenetre = pygame.display.set_mode((largeur, hauteur))
 
-# Choix:
+# Choix:w
 choix_ecr = ['Joueur VS Ordinateur', 'Joueur VS Joueur', 'Campagne', 'Quitter']
 ecart_bord_haut = hauteur - (hauteur * 7 / 41)
 ecart_ecriture = hauteur * 8 / 41
@@ -71,6 +72,8 @@ def menu():
                             evenement.pos[1] <= coordonne_y_ecrtiture[0] and evenement.pos[1] >= coordonne_y_ecrtiture[
                         1]:
                         # Player vs Computer
+                        # TODO: async or multithread
+                        widget.run_ui()
                         pve((largeur, hauteur), fenetre)
 
 

@@ -1,7 +1,7 @@
 import pygame
 import pygame.freetype
 from affichage import dessin
-import tkinter
+
 
 def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
     """
@@ -17,7 +17,8 @@ def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
 
     settings_rect_dims: tuple[int, int] = int(dimensions[0] * 0.6), int(dimensions[1] * 0.6)
     # Calculer les dimensions du coin supérieur gauche
-    settings_rect_xy: tuple[int, int] = (dimensions[0] - settings_rect_dims[0]) // 2, (dimensions[1] - settings_rect_dims[1]) // 2
+    settings_rect_xy: tuple[int, int] = (dimensions[0] - settings_rect_dims[0]) // 2, (
+                dimensions[1] - settings_rect_dims[1]) // 2
 
     dessin(fenetre, arriere_plan)
 
@@ -96,4 +97,3 @@ def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
 
         pygame.display.flip()
         clock.tick(60)
-
