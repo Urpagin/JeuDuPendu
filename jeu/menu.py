@@ -73,7 +73,6 @@ def menu():
                         1]:
                         # Player vs Computer
                         # TODO: async or multithread
-                        widget.run_ui()
                         pve((largeur, hauteur), fenetre)
 
 

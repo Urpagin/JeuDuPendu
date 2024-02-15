@@ -1,6 +1,9 @@
 import pygame
 import pygame.freetype
 from affichage import dessin
+from qt_guis.new_game_settings import widget
+import threading
+
 
 
 def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
@@ -10,6 +13,10 @@ def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
     :param dimensions: (largeur, hauteur) de la fenètre
     :return: ?
     """
+
+    # get user information
+    widget.run_ui()
+
     arriere_plan = pygame.transform.scale(pygame.image.load('../img/pendu_menu.png'), dimensions)
     dessin(fenetre, arriere_plan)
     pygame.display.update()  # rafraichi la fenêtre

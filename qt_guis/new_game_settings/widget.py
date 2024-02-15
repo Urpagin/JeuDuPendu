@@ -15,6 +15,15 @@ class Widget(QWidget):
         super().__init__(parent)
         self.ui = Ui_Widget()
         self.ui.setupUi(self)
+        self.ui.difficulty_combo_box
+        self.ui.
+
+
+def retrieve_values(self):
+    # Retrieves value form Qpy
+    player_name: str = self.ui.player_name_line_edit
+    difficulty: str = self.ui.difficulty_combo_box
+
 
 
 def run_ui() -> None:
