@@ -1,106 +1,194 @@
+import json
+import random
+import time
+
+import nltk  # Natural Language Toolkit
 import pygame
 import pygame.freetype
-from affichage import dessin
+from nltk.corpus import cmudict
+
 from qt_guis.new_game_settings import widget
-import threading
+
+# Ensure you have the necessary NLTK data
+nltk.download('cmudict')
+
+# Prepare a dictionary for syllable count lookup
+d = cmudict.dict()
 
 
+def syllable_count(word):
+    """Return the number of syllables in a word."""
+    return [len(list(y for y in x if y[-1].isdigit())) for x in d[word.lower()]][0]
 
-def pve(dimensions: tuple[int, int], fenetre: pygame.surface.Surface):
-    """
-    fonction qui ....
-    :param fenetre: fenetre afin d'afficher
-    :param dimensions: (largeur, hauteur) de la fenètre
-    :return: ?
-    """
 
-    # get user information
+def categorize_word(word: str) -> int:
+    """Categorize a word based on length and syllable count."""
+    try:
+        syllables = syllable_count(word)
+    except KeyError:
+        # If the word is not found in the cmudict, approximate by word length
+        syllables = len(word) // 3
+
+    length = len(word)
+
+    if length <= 4 or syllables == 1:
+        return 0
+    elif 4 < length <= 7:
+        return 1
+    elif 7 < length <= 10 or 1 < syllables <= 3:
+        return 2
+    else:
+        return 3
+
+
+def main(dimensions: tuple[int, int]):
     widget.run_ui()
 
-    arriere_plan = pygame.transform.scale(pygame.image.load('../img/pendu_menu.png'), dimensions)
-    dessin(fenetre, arriere_plan)
-    pygame.display.update()  # rafraichi la fenêtre
-    clock = pygame.time.Clock()
-
-    settings_rect_dims: tuple[int, int] = int(dimensions[0] * 0.6), int(dimensions[1] * 0.6)
-    # Calculer les dimensions du coin supérieur gauche
-    settings_rect_xy: tuple[int, int] = (dimensions[0] - settings_rect_dims[0]) // 2, (
-                dimensions[1] - settings_rect_dims[1]) // 2
-
-    dessin(fenetre, arriere_plan)
-
-    # Font setup
-    pygame.freetype.init()
-    font_size = 24
-    font = pygame.freetype.SysFont('../resources/LilitaOne-Regular.ttf', font_size)
+    # Set up the display
+    screen_width, screen_height = dimensions
+    screen = pygame.display.set_mode(dimensions)
 
     # Colors
-    white = (255, 255, 255)
-    grey = (200, 200, 200)
-    darker_grey = (150, 150, 150)
     black = (0, 0, 0)
+    white = (255, 255, 255)
+    weird_color = (255, 0, 255)
 
-    # Settings placeholder
-    player_name = 'Joueur'
-    difficulty_levels = ['Facile', 'Normal', 'Difficile']
-    selected_difficulty = difficulty_levels[1]
-    languages = ['Français', 'English']
-    selected_language = languages[0]
+    # Set the font and size
+    font_size = 100
+    font = pygame.font.SysFont(None, font_size)
 
-    # Start game button
-    button_color = grey
-    button_hover_color = darker_grey
-    button_rect = pygame.Rect(dimensions[0] / 2 - 100, dimensions[1] - 100, 200, 50)
-    button_text = "Lancer"
+    # Word to guess and current state
+    # word_to_guess = "PYTHON"
+    flag = True
 
-    # Input field for player name
-    input_active = False  # Initially, the input field is not active
-    input_rect = pygame.Rect(100, 100, 140, 30)  # Position and size of the input field
+    with open('info.json', 'r', encoding='utf-8') as f:
+        data: json = json.load(f)
+        player_name: str = data['player_name']
+        difficulty: int = data['difficulty']
+        language: str = data['language']
 
-    while True:
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_pressed = pygame.mouse.get_pressed()
+    print(player_name, difficulty, language)
+
+    word_to_guess: str = get_random_word_v2(language=language, difficulty=difficulty).upper().strip().replace(' ', '')
+    print(word_to_guess)
+
+    #if language == 'Anglais':
+    #    words_file: str = ''
+
+    #with open('language.txt', 'r', encoding='utf-8') as f:
+    #    for i in f:
+    #        if language == 'Anglais':
+    #            word_to_guess: str = get_random_word(1).upper().strip().replace(' ', '')
+    #        else:
+    #            word_to_guess: str = get_random_word().upper().strip().replace(' ', '')
+
+    # TODO DELETE !!!!!!!
+    #word_to_guess = "ABC"
+
+    current_state = ["_" for _ in word_to_guess]
+    print(word_to_guess)
+
+    # Counter for incorrect guesses
+    mistake_counter = 0
+
+    # Main loop
+    running = True
+    player_win = False
+    flag2 = False
+    while running:
+        # If player won
+        if '_' not in current_state:
+            bg_image_path = f'../resources/win.jpeg'
+            bg_image = pygame.image.load(bg_image_path)
+            bg_image = pygame.transform.scale(bg_image, dimensions)
+            screen.blit(bg_image, (0, 0))
+
+            print('PLAYER WON')
+            if player_name:
+                text_surface = font.render(f'BRAVO, {player_name}, VOUS AVEZ GAGNEZ!', True, (255, 0, 0))
+            else:
+                text_surface = font.render(f'BRAVO VOUS AVEZ GAGNEZ!', True, (255, 0, 0))
+            text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(text_surface, text_rect)
+            pygame.display.flip()
+            time.sleep(5)
+            running = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                raise SystemExit
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if button_rect.collidepoint(mouse_pos):
-                    print('button clicked!')
-                # Activate the input field when clicked
-                if input_rect.collidepoint(mouse_pos):
-                    input_active = True
+                running = False
+
+            if event.type == pygame.KEYDOWN:
+                # Check if the pressed key is a letter
+                if not event.unicode.isalpha():
+                    continue
+
+                if mistake_counter == 5:
+                    print('RETURING')
+                    running = False
+
+                guess = event.unicode.upper()
+                if guess in word_to_guess:
+                    for index, letter in enumerate(word_to_guess):
+                        if letter == guess:
+                            current_state[index] = guess
                 else:
-                    input_active = False
-            if event.type == pygame.KEYDOWN and input_active:
-                if event.key == pygame.K_BACKSPACE:
-                    player_name = player_name[:-1]
-                else:
-                    player_name += event.unicode
+                    mistake_counter += 1
+                    # handle failure
+                    if mistake_counter > 5:
+                        mistake_counter = 5
 
-        fenetre.fill((0, 0,
-                      0))  # Clear the entire screen (use the appropriate background color or draw the background image again)
-        dessin(fenetre, arriere_plan)  # Redraw the background if necessary
+        # Load and display the background image based on the mistake counter
+        bg_image_path = f'../resources/gallows/gallows{mistake_counter}.png'
+        bg_image = pygame.image.load(bg_image_path)
+        bg_image = pygame.transform.scale(bg_image, dimensions)
+        screen.blit(bg_image, (0, 0))
+        if mistake_counter != 5:
+            # Display the current state of the guessed word
+            text_surface = font.render(' '.join(current_state), True, weird_color)
+            text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(text_surface, text_rect)
 
-        # Clear the input field area by filling it with the background color before drawing the text
-        pygame.draw.rect(fenetre, white, input_rect)  # Fill the input field with a solid color
-        pygame.draw.rect(fenetre, black, input_rect, 2)  # Draw the border of the input field
+        if mistake_counter == 5:
+            text_surface = font.render(f'VOUS AVEZ PERDU! ({word_to_guess})', True, (255, 0, 0))
+            text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(text_surface, text_rect)
+            pygame.display.flip()
 
-        input_text_surface = font.render(f'Pseudonyme: {player_name}', fgcolor=black, size=font_size)[0]
-        fenetre.blit(input_text_surface, (input_rect.x + 5, input_rect.y + 5))
-
-        # Draw the settings rectangle
-        pygame.draw.rect(fenetre, white, (settings_rect_xy + settings_rect_dims))
-
-        # Draw the start game button
-        if button_rect.collidepoint(mouse_pos):
-            pygame.draw.rect(fenetre, button_hover_color, button_rect)  # Button hover effect
-        else:
-            pygame.draw.rect(fenetre, button_color, button_rect)
-        button_text_surface = font.render(button_text, fgcolor=black, size=font_size)[0]
-        fenetre.blit(button_text_surface, (button_rect.x + (button_rect.width - button_text_surface.get_width()) / 2,
-                                           button_rect.y + (button_rect.height - button_text_surface.get_height()) / 2))
-
+        # Update the display
         pygame.display.flip()
-        clock.tick(60)
+
+
+def get_random_word(e=0) -> str:
+    if e == 0:
+        with open('../resources/words.txt', 'r', encoding='utf-8') as f:
+            words: list[str] = f.readlines()
+            return random.choice(words)
+    else:
+        with open('../resources/english.txt', 'r', encoding='utf-8') as f:
+            words: list[str] = f.readlines()
+            return random.choice(words)
+
+
+def get_random_word_v2(language: str, difficulty: int) -> str:
+    words: list[str] = []
+    if language == 'Anglais':
+        with open('../resources/english.txt', 'r', encoding='utf-8') as f:
+            for word in f:
+                words.append(word)
+            random.shuffle(words)
+            for word in words:
+                if categorize_word(word) == difficulty:
+                    return word
+    else:
+        with open('../resources/words.txt', 'r', encoding='utf-8') as f:
+            for word in f:
+                words.append(word)
+            random.shuffle(words)
+            for word in words:
+                if categorize_word(word) == difficulty:
+                    return word
+
+
+if __name__ == '__main__':
+    print(categorize_word('parfait'))
